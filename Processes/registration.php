@@ -14,7 +14,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bindParam(':email', $email);
 
     if ($stmt->execute()) {
-        echo "Registration successful. Data has been stored in the database.";
+        // Redirect to index.html upon successful registration
+        header("Location: ../index.html");
+        exit;
     } else {
         echo "Error during registration. Data was not stored in the database.";
     }

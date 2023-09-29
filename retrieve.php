@@ -1,27 +1,59 @@
 <?php
-include 'Database.php';
+require 'database.php'; 
+class User {
+    private $db;
 
-$db = new Database();
-$conn = $db->getConnection();
-
-$sql = "SELECT * FROM users";
-$stmt = $conn->query($sql);
-
-if ($stmt) {
-    echo "<h2>Registered Users</h2>";
-    echo "<table border='1'>";
-    echo "<tr><th>ID</th><th>Name</th><th>Email</th></tr>";
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "<tr>";
-        echo "<td>" . $row['id'] . "</td>";
-        echo "<td>" . $row['name'] . "</td>";
-        echo "<td>" . $row['email'] . "</td>";
-        echo "</tr>";
+    public function __construct(Database $db) {
+        $this->db = $db;
     }
 
-    echo "</table>";
-} else {
-    echo "Error reading data from the database.";
+    public function getAllUsers() {
+        $conn = $this->db->getConnection();
+
+        $sql = "SELECT * FROM users";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
+
+
+$db = new Database();
+
+
+$user = new User($db);
+$users = $user->getAllUsers();
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users List</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+<body>
+    <h1>Users List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user) : ?>
+                <tr>
+                    <td><?= $user['id']; ?></td>
+                    <td><?= $user['name']; ?></td>
+                    <td><?= $user['email']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</body>
+</html>
